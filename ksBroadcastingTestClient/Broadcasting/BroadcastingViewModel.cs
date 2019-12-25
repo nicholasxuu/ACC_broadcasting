@@ -24,10 +24,10 @@ namespace ksBroadcastingTestClient.Broadcasting
 
     private List<BroadcastingNetworkProtocol> _clients = new List<BroadcastingNetworkProtocol>();
 
-    public bool isAutoSwitchFocusCarMode = false;
+    public bool IsAutoSwitchFocusCarMode = false;
     private int _autoSwitchMinimumInterval = 8; // seconds 
     private long _autoSwitchLastSwitchTime = 0;
-    public UInt16 currentFocusedCarIndex = 0;
+    public UInt16 CurrentFocusedCarIndex = 0;
 
     public BroadcastingViewModel()
     {
@@ -47,24 +47,24 @@ namespace ksBroadcastingTestClient.Broadcasting
           // mssing readonly check, will skip this as the ACC client has to handle this as well
           var newFocusedCarIndex = Convert.ToUInt16(car.CarIndex);
           client.SetFocus(newFocusedCarIndex);
-          this.currentFocusedCarIndex = newFocusedCarIndex;
+          this.CurrentFocusedCarIndex = newFocusedCarIndex;
         }
       }
     }
 
     private void RequestToggleAutoFocusCar(object obj)
     {
-      this.isAutoSwitchFocusCarMode = !this.isAutoSwitchFocusCarMode;
+      this.IsAutoSwitchFocusCarMode = !this.IsAutoSwitchFocusCarMode;
     }
 
     private void RequestEnableSwitchAutoFocusCar(object obj)
     {
-      this.isAutoSwitchFocusCarMode = true;
+      this.IsAutoSwitchFocusCarMode = true;
     }
 
     private void RequestDisableSwitchAutoFocusCar(object obj)
     {
-      this.isAutoSwitchFocusCarMode = false;
+      this.IsAutoSwitchFocusCarMode = false;
     }
 
     private void RequestHudPageChange(string requestedHudPage)
@@ -163,7 +163,7 @@ namespace ksBroadcastingTestClient.Broadcasting
         Debug.WriteLine(ex.Message);
       }
 
-      if (this.isAutoSwitchFocusCarMode)
+      if (this.IsAutoSwitchFocusCarMode)
       {
         this.handleAutoSwitchCar();
       }
@@ -260,7 +260,7 @@ namespace ksBroadcastingTestClient.Broadcasting
           carBehind.GapFrontMeters = splineDistance * TrackVM.TrackMeters;
 
           var carBehindCarIndex = Convert.ToUInt16(newFocusedCar.CarIndex);
-          if (currentFocusedCarIndex != carBehindCarIndex)
+          if (CurrentFocusedCarIndex != carBehindCarIndex)
           {
             carBehind.BroadcastTimeWeightDeduction = carBehind.BroadcastTimeWeightDeduction / 2;
           }
@@ -284,14 +284,14 @@ namespace ksBroadcastingTestClient.Broadcasting
         var newFocusedCarIndex = Convert.ToUInt16(newFocusedCar.CarIndex);
 
 
-        if (this.currentFocusedCarIndex == newFocusedCarIndex)
+        if (this.CurrentFocusedCarIndex == newFocusedCarIndex)
         {
           foreach (var client in _clients)
           {
             client.SetFocus(newFocusedCarIndex);
           }
 
-          this.currentFocusedCarIndex = newFocusedCarIndex;
+          this.CurrentFocusedCarIndex = newFocusedCarIndex;
           this._autoSwitchLastSwitchTime = currentTime;
         }
       }
