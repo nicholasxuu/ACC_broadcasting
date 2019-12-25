@@ -16,11 +16,25 @@ namespace ksBroadcastingTestClient.Broadcasting
         public TrackViewModel TrackVM { get => Get<TrackViewModel>(); private set => Set(value); }
         public KSRelayCommand RequestFocusedCarCommand { get; }
 
+        public KSRelayCommand RequestToggleAutoFocusCarCommand { get; }
+
+        public KSRelayCommand RequestEnableSwitchAutoFocusCarCommand { get; }
+
+        public KSRelayCommand RequestDisableSwitchAutoFocusCarCommand { get; }
+
         private List<BroadcastingNetworkProtocol> _clients = new List<BroadcastingNetworkProtocol>();
+
+        public bool isAutoSwitchFocusCarMode = false;
+        private int _autoSwitchMinimumInterval = 1; // seconds 
+        private long _autoSwitchLastSwitchTime = 0;
+        public UInt16 currentFocusedCarIndex = 0;
 
         public BroadcastingViewModel()
         {
             RequestFocusedCarCommand = new KSRelayCommand(RequestFocusedCar);
+            RequestToggleAutoFocusCarCommand = new KSRelayCommand(RequestToggleAutoFocusCar);
+            RequestEnableSwitchAutoFocusCarCommand = new KSRelayCommand(RequestEnableSwitchAutoFocusCar);
+            RequestDisableSwitchAutoFocusCarCommand = new KSRelayCommand(RequestDisableSwitchAutoFocusCar);
         }
 
         private void RequestFocusedCar(object obj)
@@ -31,9 +45,26 @@ namespace ksBroadcastingTestClient.Broadcasting
                 foreach (var client in _clients)
                 {
                     // mssing readonly check, will skip this as the ACC client has to handle this as well
-                    client.SetFocus(Convert.ToUInt16(car.CarIndex));
+                    var newFocusedCarIndex = Convert.ToUInt16(car.CarIndex);
+                    client.SetFocus(newFocusedCarIndex);
+                    this.currentFocusedCarIndex = newFocusedCarIndex;
                 }
             }
+        }
+
+        private void RequestToggleAutoFocusCar(object obj)
+        {
+            this.isAutoSwitchFocusCarMode = !this.isAutoSwitchFocusCarMode;
+        }
+
+        private void RequestEnableSwitchAutoFocusCar(object obj)
+        {
+            this.isAutoSwitchFocusCarMode = true;
+        }
+
+        private void RequestDisableSwitchAutoFocusCar(object obj)
+        {
+            this.isAutoSwitchFocusCarMode = false;
         }
 
         private void RequestHudPageChange(string requestedHudPage)
@@ -103,7 +134,7 @@ namespace ksBroadcastingTestClient.Broadcasting
         private void MessageHandler_OnRealtimeUpdate(string sender, RealtimeUpdate update)
         {
             if (TrackVM != null)
-                TrackVM.Update(update);
+            TrackVM.Update(update);
 
             foreach (var carVM in Cars)
             {
@@ -131,6 +162,35 @@ namespace ksBroadcastingTestClient.Broadcasting
             {
                 Debug.WriteLine(ex.Message);
             }
+
+            if (this.isAutoSwitchFocusCarMode)
+            {
+                try
+                {
+                    var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    if (currentTime - this._autoSwitchLastSwitchTime > this._autoSwitchMinimumInterval)
+                    {
+            
+
+                        var sortedCarsByGapMeters = Cars.Where(x => x.GapFrontMeters > 0 && x.CarLocation != CarLocationEnum.Pitlane).OrderBy(x => x.GapFrontMeters).ToArray();
+                        var carWithSmallestGapFront = sortedCarsByGapMeters[0];
+
+                        var newFocusedCarIndex = Convert.ToUInt16(carWithSmallestGapFront.CarIndex);
+                        foreach(var client in _clients)
+                        {
+                            client.SetFocus(newFocusedCarIndex);
+                        }
+            
+                        this.currentFocusedCarIndex = newFocusedCarIndex;
+                        this._autoSwitchLastSwitchTime = currentTime;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+
         }
 
         private void MessageHandler_OnRealtimeCarUpdate(string sender, RealtimeCarUpdate carUpdate)

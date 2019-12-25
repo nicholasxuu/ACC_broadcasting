@@ -17,6 +17,13 @@
     </UserControl.Resources>
     <Grid>
         <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Auto Switch Car ON" Command="{Binding ElementName=EntryListControl, Path=DataContext.RequestEnableSwitchAutoFocusCarCommand}" CommandParameter="30" Width="200" Height="28" Margin="3"/>
+                <Button Content="Auto Switch Car OFF" Command="{Binding ElementName=EntryListControl, Path=DataContext.RequestDisableSwitchAutoFocusCarCommand}" CommandParameter="30" Width="200" Height="28" Margin="3"/>
+                <TextBlock Text="-" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                <TextBlock Text="{Binding  ElementName=EntryListControl, Path=DataContext.currentFocusedCarIndex}" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                <TextBlock Text="-" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            </StackPanel>
             <!-- Header -->
             <StackPanel Orientation="Horizontal">
                 <TextBlock Width="30" Text="P" Style="{StaticResource RowSizedText}" TextAlignment="Center" ToolTip="Session Position/Rank" />
