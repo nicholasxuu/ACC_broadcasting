@@ -53,6 +53,10 @@ namespace ksBroadcastingTestClient.Broadcasting
             }
         }
 
+        public int BroadcastWeight { get => Get<int>(); set => Set(value); }
+
+        public int BroadcastTimeWeightDeduction { get => Get<int>(); set => Set(value); }
+
         public string GapText {
             get {
                 if (Kmh < 10)

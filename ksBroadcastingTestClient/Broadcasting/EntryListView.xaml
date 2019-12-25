@@ -33,6 +33,8 @@
                 <TextBlock Width="50" Text="Laps" Style="{StaticResource RowSizedText}" TextAlignment="Center" ToolTip="Laps completed" />
                 <TextBlock Width="50" Text="Loc" Style="{StaticResource RowSizedText}" TextAlignment="Center" ToolTip="Location hints: PEn = PitEntry, PLa = PitLane, PEx = PitExit, OUT = Outlap, IN = Inlap" />
                 <TextBlock Width="40" Text="D" Style="{StaticResource RowSizedText}" TextAlignment="Center" ToolTip="Delta to best lap" />
+                <TextBlock Width="25" Text="BW+" Style="{StaticResource RowSizedText}" TextAlignment="Center" ToolTip="BroadcastWeight" />
+                <TextBlock Width="25" Text="BW-" Style="{StaticResource RowSizedText}" TextAlignment="Center" ToolTip="BroadcastTimeWeightDeduction" />
                 <TextBlock Width="75" Text="Current" Style="{StaticResource RowSizedText}" TextAlignment="Center" ToolTip="Current laptime, splits, in/outlap hint" />
                 <TextBlock Width="75" Text="Last" Style="{StaticResource RowSizedText}" TextAlignment="Center" ToolTip="Driver's last laptime, splits, in/outlap hint" />
                 <TextBlock Width="75" Text="Best" Style="{StaticResource RowSizedText}" TextAlignment="Center" ToolTip="Car's best laptime, splits, in/outlap hint" />

@@ -25,7 +25,7 @@ namespace ksBroadcastingTestClient.Broadcasting
         private List<BroadcastingNetworkProtocol> _clients = new List<BroadcastingNetworkProtocol>();
 
         public bool isAutoSwitchFocusCarMode = false;
-        private int _autoSwitchMinimumInterval = 1; // seconds 
+        private int _autoSwitchMinimumInterval = 8; // seconds 
         private long _autoSwitchLastSwitchTime = 0;
         public UInt16 currentFocusedCarIndex = 0;
 
@@ -134,7 +134,7 @@ namespace ksBroadcastingTestClient.Broadcasting
         private void MessageHandler_OnRealtimeUpdate(string sender, RealtimeUpdate update)
         {
             if (TrackVM != null)
-            TrackVM.Update(update);
+                TrackVM.Update(update);
 
             foreach (var carVM in Cars)
             {
@@ -165,32 +165,132 @@ namespace ksBroadcastingTestClient.Broadcasting
 
             if (this.isAutoSwitchFocusCarMode)
             {
-                try
-                {
-                    var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                    if (currentTime - this._autoSwitchLastSwitchTime > this._autoSwitchMinimumInterval)
-                    {
-            
+                this.handleAutoSwitchCar();
+            }
 
-                        var sortedCarsByGapMeters = Cars.Where(x => x.GapFrontMeters > 0 && x.CarLocation != CarLocationEnum.Pitlane).OrderBy(x => x.GapFrontMeters).ToArray();
-                        var carWithSmallestGapFront = sortedCarsByGapMeters[0];
+        }
 
-                        var newFocusedCarIndex = Convert.ToUInt16(carWithSmallestGapFront.CarIndex);
-                        foreach(var client in _clients)
-                        {
-                            client.SetFocus(newFocusedCarIndex);
-                        }
-            
-                        this.currentFocusedCarIndex = newFocusedCarIndex;
-                        this._autoSwitchLastSwitchTime = currentTime;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
+        private int calculateBroadcastWeight(CarViewModel currCar, CarViewModel carFront) 
+        {
+            // broadcaseWeight (higher better) = car_hot_level - car_cooldown_level
+            // car_hot_level = 1 / GapFrontMeters (smaller better) + 1 / position (smaller better) + pit_exit_bonus + front_car_pit_exit_bonus(++bonus)
+            // GapFrontMeters: 1 must watch - 10000, 10 hot battle - 100, 50 close - 70, 100 okay - 40, 200 hardly visible - 0
+            // position: 1-10 has point bonus of: 25	18	15	12	10	8	6	4	2	1
+            // car_cooldown_level = recent_focused_time (higher better)
+
+            var currWeight = 0;
+            if (currCar.GapFrontMeters <= 1) 
+            {
+                currWeight += 10000;
+            }
+            else if (currCar.GapFrontMeters <= 5) 
+            {
+                currWeight += 1000;
+            } 
+            else if (currCar.GapFrontMeters <= 10) 
+            {
+                currWeight += 100;
+            }
+            else if (currCar.GapFrontMeters <= 30)
+            {
+                currWeight += 90;
+            }
+            else if (currCar.GapFrontMeters <= 50)
+            {
+                currWeight += 70;
+            }
+            else if (currCar.GapFrontMeters <= 100)
+            {
+                currWeight += 40 + (currCar.GapFrontMeters - 50) / (100 - 50) * (70 - 40);
+            }
+            else if (currCar.GapFrontMeters <= 200) 
+            {
+                currWeight += 0 + (currCar.GapFrontMeters - 100) / (200 - 100) * (40 - 0);
+            }
+
+            var positionBonuses = new int[10] {25, 18, 15, 12, 10, 8, 6, 4, 2, 1};
+            if (carFront.Position <= 10) {
+                currWeight += positionBonuses[carFront.Position - 1];
+            }
+
+            if (currCar.CarLocation == CarLocationEnum.PitEntry) {
+                currWeight += 5;
+            }
+
+            if (currCar.CarLocation == CarLocationEnum.PitExit) {
+                currWeight += 10;
+            }
+
+            if (carFront.CarLocation == CarLocationEnum.PitExit && currCar.GapFrontMeters < 500) {
+                currWeight += 20;
+
+                if (currCar.GapFrontMeters < 200) {
+                    currWeight += 30;
                 }
             }
 
+            return currWeight - currCar.BroadcastTimeWeightDeduction;
+        }
+
+        private void handleAutoSwitchCar() 
+        {
+            try
+            {
+                if (currentTime - this._autoSwitchLastSwitchTime < this._autoSwitchMinimumInterval) {
+                    return;
+                }
+
+                var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+                var sortedCars = Cars.OrderBy(x => x.SplinePosition).ToArray();
+                for (int i = 1; i < sortedCars.Length; i++)
+                {
+                    var carAhead = sortedCars[i - 1];
+                    var carBehind = sortedCars[i];
+                    var splineDistance = Math.Abs(carAhead.SplinePosition - carBehind.SplinePosition);
+                    while (splineDistance > 1f)
+                        splineDistance -= 1f;
+
+                    carBehind.GapFrontMeters = splineDistance * TrackVM.TrackMeters;
+
+                    var carBehindCarIndex = Convert.ToUInt16(newFocusedCar.CarIndex);
+                    if (currentFocusedCarIndex != carBehindCarIndex) 
+                    {
+                        carBehind.BroadcastTimeWeightDeduction = carBehind.BroadcastTimeWeightDeduction / 2;
+                    }
+                    else
+                    {
+                        carBehind.BroadcastTimeWeightDeduction = currentTime - this._autoSwitchLastSwitchTime;
+                    }
+
+                    
+                    carBehind.BroadcastWeight = this.calculateBroadcastWeight(carBehind, carAhead);
+                }
+
+                var sortedCarsByGapMeters = Cars
+                    .Where(x => x.GapFrontMeters > 0 && x.CarLocation != CarLocationEnum.Pitlane && x.Kmh > 0)
+                    .OrderByDescending(x => x.BroadcastWeight)
+                    .ToArray();
+
+                var newFocusedCar = sortedCarsByGapMeters.FirstOrDefault();
+
+                var newFocusedCarIndex = Convert.ToUInt16(newFocusedCar.CarIndex);
+                
+    
+                if (this.currentFocusedCarIndex == newFocusedCarIndex) {
+                    foreach(var client in _clients)
+                    {
+                        client.SetFocus(newFocusedCarIndex);
+                    }
+
+                    this.currentFocusedCarIndex = newFocusedCarIndex;
+                    this._autoSwitchLastSwitchTime = currentTime;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         private void MessageHandler_OnRealtimeCarUpdate(string sender, RealtimeCarUpdate carUpdate)
