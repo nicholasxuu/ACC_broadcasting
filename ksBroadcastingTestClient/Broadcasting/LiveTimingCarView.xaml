@@ -21,8 +21,8 @@
         <TextBlock Width="50" Text="{Binding Laps}" Style="{StaticResource RowSizedText}" TextAlignment="Right" Foreground="{Binding RowForeground}" />
         <TextBlock Width="50" Text="{Binding LocationHint}" TextAlignment="Center" Style="{StaticResource RowSizedText}" Foreground="{Binding RowForeground}" />
         <TextBlock Width="40" Text="{Binding DeltaString}" Foreground="{Binding DeltaColor}" TextAlignment="Center" Style="{StaticResource RowSizedText}" />
-        <TextBlock Width="25" Text="{Binding BroadcastWeight}" Style="{StaticResource 2ThirdSizeText}" TextAlignment="Right" Foreground="{Binding RowForeground}" />
-        <TextBlock Width="25" Text="{Binding BroadcastTimeWeightDeduction}" Style="{StaticResource 2ThirdSizeText}" TextAlignment="Right" Foreground="{Binding RowForeground}" />
+        <TextBlock Width="40" Text="{Binding BroadcastWeight}" Style="{StaticResource 2ThirdSizeText}" TextAlignment="Right" Foreground="{Binding RowForeground}" />
+        <TextBlock Width="40" Text="{Binding BroadcastTimeWeightDeduction}" Style="{StaticResource 2ThirdSizeText}" TextAlignment="Right" Foreground="{Binding RowForeground}" />
 
         <StackPanel Width="75" Orientation="Vertical">
             <TextBlock Text="{Binding CurrentLap.LaptimeString}" Style="{StaticResource 2ThirdSizeText}" HorizontalAlignment="Right" Foreground="{Binding RowForeground}" />
