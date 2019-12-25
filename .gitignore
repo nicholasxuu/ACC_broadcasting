@@ -1,0 +1,13 @@
+.DS_Store
+.sync
+.vs
+.vscode
+
+ksBroadcastingNetwork/obj
+ksBroadcastingTestClient/obj
+
+ksBroadcastingNetwork/bin/
+ksBroadcastingTestClient/bin/
+
+ksBroadcastingTestClient/ksBroadcastingTestClient_cjyerzon_wpftmp.csproj
+
