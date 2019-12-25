@@ -25,7 +25,8 @@ namespace ksBroadcastingTestClient.ClientConnections
         {
             ConnectCmd = new KSRelayCommand(DoConnect);
 
-            IP = "127.0.0.1";
+            //IP = "127.0.0.1";
+            IP = "10.0.1.180";
             Port = 9000;
             DisplayName = "Your name";
             ConnectionPw = "asd";

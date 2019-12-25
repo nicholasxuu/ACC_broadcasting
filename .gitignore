@@ -11,3 +11,5 @@ ksBroadcastingTestClient/bin/
 
 ksBroadcastingTestClient/ksBroadcastingTestClient_cjyerzon_wpftmp.csproj
 
+*.rsls
+

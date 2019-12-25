@@ -21,7 +21,7 @@
                 <Button Content="Auto Switch Car ON" Command="{Binding ElementName=EntryListControl, Path=DataContext.RequestEnableSwitchAutoFocusCarCommand}" CommandParameter="30" Width="200" Height="28" Margin="3"/>
                 <Button Content="Auto Switch Car OFF" Command="{Binding ElementName=EntryListControl, Path=DataContext.RequestDisableSwitchAutoFocusCarCommand}" CommandParameter="30" Width="200" Height="28" Margin="3"/>
                 <TextBlock Text="-" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
-                <TextBlock Text="{Binding Path=CurrentFocusedCarIndex, StringFormat='自动选择车辆: {0}'}" Visibility="{Binding Path=IsAutoSwitchFocusCarMode}" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                <TextBlock Text="自动模式已开" Visibility="{Binding IsAutoSwitchFocusCarMode}" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
                 <TextBlock Text="-" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
             </StackPanel>
             <!-- Header -->

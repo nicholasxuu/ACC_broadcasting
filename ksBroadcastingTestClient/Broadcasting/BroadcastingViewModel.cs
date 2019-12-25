@@ -25,7 +25,7 @@ namespace ksBroadcastingTestClient.Broadcasting
         private List<BroadcastingNetworkProtocol> _clients = new List<BroadcastingNetworkProtocol>();
 
         public bool IsAutoSwitchFocusCarMode = false;
-        private int _autoSwitchMinimumInterval = 8; // seconds 
+        private int _autoSwitchMinimumInterval = 10; // seconds 
         private long _autoSwitchLastSwitchTime = 0;
         public UInt16 CurrentFocusedCarIndex = 0;
 
@@ -172,6 +172,10 @@ namespace ksBroadcastingTestClient.Broadcasting
 
         private int calculateBroadcastWeight(CarViewModel currCar, CarViewModel carFront)
         {
+            if (currCar.Kmh == 0 || currCar.CarLocation == CarLocationEnum.Pitlane)
+            {
+                return 0;
+            }
             // broadcaseWeight (higher better) = car_hot_level - car_cooldown_level
             // car_hot_level = 1 / GapFrontMeters (smaller better) + 1 / position (smaller better) + pit_exit_bonus + front_car_pit_exit_bonus(++bonus)
             // GapFrontMeters: 1 must watch - 10000, 10 hot battle - 100, 50 close - 70, 100 okay - 40, 200 hardly visible - 0
@@ -239,6 +243,7 @@ namespace ksBroadcastingTestClient.Broadcasting
 
         private void handleAutoSwitchCar()
         {
+            // Console.WriteLine("handleAutoSwitchCar");
             try
             {
                 var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -246,8 +251,6 @@ namespace ksBroadcastingTestClient.Broadcasting
                 {
                     return;
                 }
-
-
 
                 var sortedCars = Cars.OrderBy(x => x.SplinePosition).ToArray();
                 for (int i = 1; i < sortedCars.Length; i++)
@@ -285,7 +288,7 @@ namespace ksBroadcastingTestClient.Broadcasting
                 var newFocusedCarIndex = Convert.ToUInt16(newFocusedCar.CarIndex);
 
 
-                if (this.CurrentFocusedCarIndex == newFocusedCarIndex)
+                if (this.CurrentFocusedCarIndex != newFocusedCarIndex)
                 {
                     foreach (var client in _clients)
                     {
