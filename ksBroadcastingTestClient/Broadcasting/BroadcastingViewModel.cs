@@ -25,10 +25,13 @@ namespace ksBroadcastingTestClient.Broadcasting
         private List<BroadcastingNetworkProtocol> _clients = new List<BroadcastingNetworkProtocol>();
 
         public bool IsAutoSwitchFocusCarMode = false;
-        public string IsAutoSwitchFocusCarModeVisiblity { get => Get<string>(); set => Set(value); }
+        public string AutoSwitchFocusCarModeStatusText { get => Get<string>(); set => Set(value); }
         private int _autoSwitchMinimumInterval = 10; // seconds 
         private long _autoSwitchLastSwitchTime = 0;
         public UInt16 CurrentFocusedCarIndex = 0;
+
+        public string CurrentAutoCamera = "";
+        public long LastAutoChangeCameraTime = 0;
 
         public BroadcastingViewModel()
         {
@@ -57,14 +60,14 @@ namespace ksBroadcastingTestClient.Broadcasting
         {
             Console.WriteLine("RequestEnableSwitchAutoFocusCar");
             this.IsAutoSwitchFocusCarMode = true;
-            this.IsAutoSwitchFocusCarModeVisiblity = "自动切换中";
+            this.AutoSwitchFocusCarModeStatusText = "自动切换中";
         }
 
         private void RequestDisableSwitchAutoFocusCar(object obj)
         {
             Console.WriteLine("RequestDisableSwitchAutoFocusCar");
             this.IsAutoSwitchFocusCarMode = false;
-            this.IsAutoSwitchFocusCarModeVisiblity = "";
+            this.AutoSwitchFocusCarModeStatusText = "";
         }
 
         private void RequestHudPageChange(string requestedHudPage)
@@ -273,7 +276,6 @@ namespace ksBroadcastingTestClient.Broadcasting
                         carBehind.BroadcastTimeWeightDeduction = (int) (currentTime - this._autoSwitchLastSwitchTime);
                     }
 
-
                     carBehind.BroadcastWeight = this.calculateBroadcastWeight(carBehind, carAhead);
                 }
 
@@ -297,6 +299,35 @@ namespace ksBroadcastingTestClient.Broadcasting
 
                     this.CurrentFocusedCarIndex = newFocusedCarIndex;
                     this._autoSwitchLastSwitchTime = currentTime;
+                }
+
+                if (CurrentAutoCamera == "TV") 
+                {
+                    if ((currentTime - LastAutoChangeCameraTime) > 20*60) 
+                    {
+                        // set to onboard for 1 minute
+                        CurrentAutoCamera = "Onboard";
+                        LastAutoChangeCameraTime = currentTime;
+                    }
+                    
+                } 
+                else if (CurrentAutoCamera == "Onboard") 
+                {
+                    if ((currentTime - LastAutoChangeCameraTime) > 1*60) 
+                    {
+                        // set to heli 20s
+                        CurrentAutoCamera = "Heli";
+                        LastAutoChangeCameraTime = currentTime;
+                    }
+                }
+                else if (CurrentAutoCamera == "Heli") 
+                {
+                    if ((currentTime - LastAutoChangeCameraTime) > 20) 
+                    {
+                        // set to TV
+                        CurrentAutoCamera = "TV";
+                        LastAutoChangeCameraTime = currentTime;
+                    }
                 }
             }
             catch (Exception ex)

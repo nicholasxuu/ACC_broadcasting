@@ -21,7 +21,7 @@
                 <Button Content="Auto Switch Car ON" Command="{Binding ElementName=EntryListControl, Path=DataContext.RequestEnableSwitchAutoFocusCarCommand}" CommandParameter="30" Width="200" Height="28" Margin="3"/>
                 <Button Content="Auto Switch Car OFF" Command="{Binding ElementName=EntryListControl, Path=DataContext.RequestDisableSwitchAutoFocusCarCommand}" CommandParameter="30" Width="200" Height="28" Margin="3"/>
 
-                <TextBlock Text="{Binding IsAutoSwitchFocusCarModeVisiblity}" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                <TextBlock Text="{Binding AutoSwitchFocusCarModeStatusText}" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
                 
             </StackPanel>
             <!-- Header -->
