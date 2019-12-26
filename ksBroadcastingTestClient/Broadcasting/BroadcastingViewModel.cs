@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using ksBroadcastingNetwork;
 using ksBroadcastingNetwork.Structs;
 
@@ -16,7 +17,6 @@ namespace ksBroadcastingTestClient.Broadcasting
         public TrackViewModel TrackVM { get => Get<TrackViewModel>(); private set => Set(value); }
         public KSRelayCommand RequestFocusedCarCommand { get; }
 
-        public KSRelayCommand RequestToggleAutoFocusCarCommand { get; }
 
         public KSRelayCommand RequestEnableSwitchAutoFocusCarCommand { get; }
 
@@ -25,6 +25,7 @@ namespace ksBroadcastingTestClient.Broadcasting
         private List<BroadcastingNetworkProtocol> _clients = new List<BroadcastingNetworkProtocol>();
 
         public bool IsAutoSwitchFocusCarMode = false;
+        public string IsAutoSwitchFocusCarModeVisiblity { get => Get<string>(); set => Set(value); }
         private int _autoSwitchMinimumInterval = 10; // seconds 
         private long _autoSwitchLastSwitchTime = 0;
         public UInt16 CurrentFocusedCarIndex = 0;
@@ -32,7 +33,6 @@ namespace ksBroadcastingTestClient.Broadcasting
         public BroadcastingViewModel()
         {
             RequestFocusedCarCommand = new KSRelayCommand(RequestFocusedCar);
-            RequestToggleAutoFocusCarCommand = new KSRelayCommand(RequestToggleAutoFocusCar);
             RequestEnableSwitchAutoFocusCarCommand = new KSRelayCommand(RequestEnableSwitchAutoFocusCar);
             RequestDisableSwitchAutoFocusCarCommand = new KSRelayCommand(RequestDisableSwitchAutoFocusCar);
         }
@@ -52,19 +52,19 @@ namespace ksBroadcastingTestClient.Broadcasting
             }
         }
 
-        private void RequestToggleAutoFocusCar(object obj)
-        {
-            this.IsAutoSwitchFocusCarMode = !this.IsAutoSwitchFocusCarMode;
-        }
 
         private void RequestEnableSwitchAutoFocusCar(object obj)
         {
+            Console.WriteLine("RequestEnableSwitchAutoFocusCar");
             this.IsAutoSwitchFocusCarMode = true;
+            this.IsAutoSwitchFocusCarModeVisiblity = "自动切换中";
         }
 
         private void RequestDisableSwitchAutoFocusCar(object obj)
         {
+            Console.WriteLine("RequestDisableSwitchAutoFocusCar");
             this.IsAutoSwitchFocusCarMode = false;
+            this.IsAutoSwitchFocusCarModeVisiblity = "";
         }
 
         private void RequestHudPageChange(string requestedHudPage)
