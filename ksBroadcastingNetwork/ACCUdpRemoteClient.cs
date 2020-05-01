@@ -57,6 +57,7 @@ namespace ksBroadcastingNetwork
         {
             if (_listenerTask != null && !_listenerTask.IsCompleted)
             {
+                MessageHandler.Disconnect();
                 _client.Close();
                 _client = null;
                 await _listenerTask;

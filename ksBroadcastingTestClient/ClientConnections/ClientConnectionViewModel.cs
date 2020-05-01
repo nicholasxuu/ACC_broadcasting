@@ -31,5 +31,11 @@ namespace ksBroadcastingTestClient.ClientConnections
                 OnClientConnectedCallback?.Invoke(Client);
 
         }
+
+        public void Disconnect()
+        {
+            Client.MessageHandler.OnConnectionStateChanged -= ConnectionStateChanged;
+            Client.Shutdown();
+        }
     }
 }

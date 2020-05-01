@@ -38,7 +38,7 @@ namespace ksBroadcastingNetwork
 
     public class BroadcastingNetworkProtocol
     {
-        public const int BROADCASTING_PROTOCOL_VERSION = 3;
+        public const int BROADCASTING_PROTOCOL_VERSION = 4;
         private string ConnectionIdentifier { get; }
         private SendMessageDelegate Send { get; }
         public int ConnectionId { get; private set; }
@@ -145,6 +145,7 @@ namespace ksBroadcastingNetwork
                         carInfo.RaceNumber = br.ReadInt32();
                         carInfo.CupCategory = br.ReadByte(); // Cup: Overall/Pro = 0, ProAm = 1, Am = 2, Silver = 3, National = 4
                         carInfo.CurrentDriverIndex = br.ReadByte();
+                        carInfo.Nationality = (NationalityEnum)br.ReadUInt16();
 
                         // Now the drivers on this car:
                         var driversOnCarCount = br.ReadByte();
@@ -156,6 +157,9 @@ namespace ksBroadcastingNetwork
                             driverInfo.LastName = ReadString(br);
                             driverInfo.ShortName = ReadString(br);
                             driverInfo.Category = (DriverCategory)br.ReadByte(); // Platinum = 3, Gold = 2, Silver = 1, Bronze = 0
+
+                            // new in 1.13.11:
+                            driverInfo.Nationality = (NationalityEnum)br.ReadUInt16();
 
                             carInfo.AddDriver(driverInfo);
                         }
@@ -379,6 +383,17 @@ namespace ksBroadcastingNetwork
                 Send(ms.ToArray());
             }
         }
+
+        internal void Disconnect()
+        {
+            using (var ms = new MemoryStream())
+            using (var br = new BinaryWriter(ms))
+            {
+                br.Write((byte)OutboundMessageTypes.UNREGISTER_COMMAND_APPLICATION); // First byte is always the command type
+                Send(ms.ToArray());
+            }
+        }
+
 
         /// <summary>
         /// Will ask the ACC client for an updated entry list, containing all car and driver data.

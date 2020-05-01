@@ -17,16 +17,18 @@ namespace ksBroadcastingTestClient.ClientConnections
         public string CommandPw { get => Get<string>(); set => Set(value); }
         public int RealtimeUpdateIntervalMS { get => Get<int>(); set => Set(value); }
         public KSRelayCommand ConnectCmd { get; }
+        public KSRelayCommand DisconnectCmd { get; }
 
         public ObservableCollection<ClientConnectionViewModel> Clients { get; } = new ObservableCollection<ClientConnectionViewModel>();
         public Action<ACCUdpRemoteClient> OnClientConnectedCallback { get; }
+        public ClientConnectionViewModel SelectedClient { get => Get<ClientConnectionViewModel>(); set => Set(value); }
 
         public ClientPanelViewModel(Action<ACCUdpRemoteClient> onClientConnectedCallback)
         {
             ConnectCmd = new KSRelayCommand(DoConnect);
+            DisconnectCmd = new KSRelayCommand(DoDisconnect);
 
             IP = "127.0.0.1";
-            //IP = "10.0.1.180";
             Port = 9000;
             DisplayName = "Your name";
             ConnectionPw = "asd";
@@ -41,11 +43,21 @@ namespace ksBroadcastingTestClient.ClientConnections
             Clients.Add(new ClientConnectionViewModel(c, OnClientConnectedCallback));
         }
 
+        private void DoDisconnect(object obj)
+        {
+            if(SelectedClient != null)
+            {
+                SelectedClient.Disconnect();
+                Clients.Remove(SelectedClient);
+                SelectedClient = null;
+            }
+        }
+
         internal void Shutdown()
         {
             foreach (var client in Clients)
             {
-                client.Client.Shutdown();
+                client.Disconnect();
             }
             Clients.Clear();
         }

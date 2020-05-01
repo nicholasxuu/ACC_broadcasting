@@ -23,6 +23,7 @@
             <TextBlock Text="Update interval:" Margin="1" />
             <TextBlock Text="Command PW:"  Margin="1"/>
             <Button Content="Connect" Command="{Binding ConnectCmd}" Margin="1"/>
+            <Button Content="Disconnect" Command="{Binding DisconnectCmd}" Margin="1"/>
         </StackPanel>
         <StackPanel Grid.Column="1">
             <TextBox Text="{Binding IP}" />
@@ -33,7 +34,7 @@
             <TextBox Text="{Binding CommandPw}" />
         </StackPanel>
 
-        <ListView ItemsSource="{Binding Clients}"
+        <ListView ItemsSource="{Binding Clients}" SelectedItem="{Binding SelectedClient}"
                   Grid.ColumnSpan="2" Grid.Row="1" Margin="1, 20, 1, 1">
             <ListView.ItemTemplate>
                 <DataTemplate>

@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -55,6 +58,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Autopilot\AutopilotCarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Autopilot\AutopilotView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Autopilot\AutopilotWeightsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Autopilot\CameraManagementView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Autopilot\CarWeightCategoryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Broadcasting\BroadcastingEventView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -95,6 +118,26 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Autopilot\AutopilotCarView.xaml.cs">
+      <DependentUpon>AutopilotCarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Autopilot\AutopilotCarViewModel.cs" />
+    <Compile Include="Autopilot\AutopilotView.xaml.cs">
+      <DependentUpon>AutopilotView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Autopilot\AutopilotViewModel.cs" />
+    <Compile Include="Autopilot\AutopilotWeightsView.xaml.cs">
+      <DependentUpon>AutopilotWeightsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Autopilot\AutopilotWeightsViewModel.cs" />
+    <Compile Include="Autopilot\CameraManagementView.xaml.cs">
+      <DependentUpon>CameraManagementView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Autopilot\CameraManagementViewModel.cs" />
+    <Compile Include="Autopilot\CarWeightCategoryView.xaml.cs">
+      <DependentUpon>CarWeightCategoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Autopilot\CarWeightCategoryViewModel.cs" />
     <Compile Include="Broadcasting\BroadcastingEventView.xaml.cs">
       <DependentUpon>BroadcastingEventView.xaml</DependentUpon>
     </Compile>
@@ -158,6 +201,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

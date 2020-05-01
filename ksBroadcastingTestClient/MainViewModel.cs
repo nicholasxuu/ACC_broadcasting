@@ -1,4 +1,5 @@
 ﻿using ksBroadcastingNetwork;
+using ksBroadcastingTestClient.Autopilot;
 using ksBroadcastingTestClient.Broadcasting;
 using ksBroadcastingTestClient.ClientConnections;
 using System;
@@ -15,6 +16,7 @@ namespace ksBroadcastingTestClient
 
         public ClientPanelViewModel ClientPanelVM { get; }
         public BroadcastingViewModel BroadcastingVM { get; }
+        public AutopilotViewModel AutopilotVM { get; }
         public SessionInfoViewModel SessionInfoVM { get; }
         public ReplayControlViewModel ReplayVM { get; }
 
@@ -24,6 +26,7 @@ namespace ksBroadcastingTestClient
         {
             ClientPanelVM = new ClientPanelViewModel(OnClientConnected);
             BroadcastingVM = new BroadcastingViewModel();
+            AutopilotVM = new AutopilotViewModel();
             SessionInfoVM = new SessionInfoViewModel();
             ReplayVM = new ReplayControlViewModel();
 
@@ -32,6 +35,7 @@ namespace ksBroadcastingTestClient
         public void OnClientConnected(ACCUdpRemoteClient newClient)
         {
             BroadcastingVM.RegisterNewClient(newClient);
+            AutopilotVM.RegisterNewClient(newClient);
             SessionInfoVM.RegisterNewClient(newClient);
             ReplayVM.RegisterNewClient(newClient);
 
